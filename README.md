@@ -19,7 +19,7 @@ Las promociones incorporan todos los cambios pendientes del origen. Los merges c
 ## Requisitos
 
 - Claude Code o Codex con soporte de skills locales y acceso al repositorio de trabajo.
-- Git para trabajar con ramas y commits.
+- Git y Node.js 22.20 o posterior (incluye `npx`) para instalar con el comando siguiente. Git también se usa para trabajar con ramas y commits.
 - Para operar en GitHub: una integración con permisos suficientes o [GitHub CLI](https://cli.github.com/) autenticado mediante `gh auth login`. Verifica la cuenta con `gh auth status`.
 - Otra persona con acceso suficiente al repositorio para revisar y aprobar los PR.
 
@@ -27,49 +27,30 @@ Sin acceso a GitHub, el agente puede preparar cambios y textos, pero no verifica
 
 ## Instalación
 
-Clona este repositorio en una carpeta de herramientas. En los ejemplos se usa una carpeta `gitflow-es` recién clonada; ejecuta las copias desde su raíz, donde están este README y la subcarpeta `gitflow-es/`.
-
-```shell
-git clone https://github.com/Danieloid3/gitflow-es.git
-cd gitflow-es
-```
-
-Instala **la subcarpeta que contiene `SKILL.md`**, no el repositorio completo. Elige instalación global o por proyecto para evitar duplicados. Si ya existe una skill con este nombre, revisa y conserva tus cambios antes de reemplazarla.
-
-### Global en Windows (PowerShell)
-
-```powershell
-# Codex
-New-Item -ItemType Directory -Force -Path "$HOME/.agents/skills" | Out-Null
-Copy-Item -LiteralPath ./gitflow-es -Destination "$HOME/.agents/skills/gitflow-es" -Recurse
-
-# Claude Code
-New-Item -ItemType Directory -Force -Path "$HOME/.claude/skills" | Out-Null
-Copy-Item -LiteralPath ./gitflow-es -Destination "$HOME/.claude/skills/gitflow-es" -Recurse
-```
-
-### Global en macOS o Linux
+**Basta ejecutar este comando para instalar la skill globalmente en Claude Code y Codex. No necesitas clonar el repositorio ni copiar archivos manualmente.**
 
 ```bash
-mkdir -p ~/.agents/skills ~/.claude/skills
-cp -R ./gitflow-es ~/.agents/skills/gitflow-es
-cp -R ./gitflow-es ~/.claude/skills/gitflow-es
+npx skills add Danieloid3/gitflow-es --skill gitflow-es -g -a claude-code codex -y
 ```
 
-Los comandos anteriores suponen que la carpeta de destino `gitflow-es` todavía no existe. No los repitas sobre una instalación existente: podrían crear una carpeta anidada.
+Funciona en Windows (PowerShell), macOS y Linux. El instalador obtiene la skill directamente de GitHub y la coloca en las ubicaciones de los agentes. No necesitas registrarla en otro servicio ni autenticar GitHub para descargar este repositorio público.
 
-### Por repositorio, para todo el equipo
+- `--skill gitflow-es`: selecciona esta skill.
+- `-g`: la hace disponible en todos tus proyectos locales.
+- `-a claude-code codex`: la instala para ambos agentes.
+- `-y`: omite las preguntas del instalador.
 
-Desde la raíz del proyecto que usará la skill, copia la carpeta del paquete a estas ubicaciones:
+Si solo usas un agente, deja únicamente `claude-code` o `codex` después de `-a`. Cada integrante del equipo ejecuta el comando en su equipo. Si ya personalizaste una instalación con el mismo nombre, guarda esas modificaciones antes de reemplazarla.
 
-| Agente | Ubicación del archivo de entrada |
-|---|---|
-| Codex | `.agents/skills/gitflow-es/SKILL.md` |
-| Claude Code | `.claude/skills/gitflow-es/SKILL.md` |
+### Instalación por proyecto (opcional)
 
-Copia también `references/` en cada instalación. Puedes incluir ambas ubicaciones en el mismo proyecto; conserva idéntico su contenido. Incorpora la instalación mediante una rama `docs/instalar-gitflow` y un PR con una aprobación. Si el proyecto aún no tiene las ramas del flujo, acuerda primero su inicialización con el equipo; esta skill no crea ni renombra ramas permanentes por su cuenta.
+Si prefieres compartir la instalación dentro de un proyecto, ejecuta desde su raíz el mismo comando sin `-g`:
 
-La instalación global afecta a tus proyectos locales; la instalación por repositorio se comparte cuando el equipo obtiene esos archivos. No instala automáticamente la skill en otros equipos.
+```bash
+npx skills add Danieloid3/gitflow-es --skill gitflow-es -a claude-code codex -y
+```
+
+Revisa los archivos y enlaces generados por el instalador e incorpóralos mediante una rama `docs/instalar-gitflow` y un PR con una aprobación. Elige instalación global o por proyecto para evitar duplicados. Si el proyecto aún no tiene las ramas del flujo, acuerda primero su inicialización con el equipo; esta skill no crea ni renombra ramas permanentes por su cuenta.
 
 ### Comprobar la instalación
 
@@ -112,12 +93,15 @@ Consulta [todas las convenciones](gitflow-es/references/convenciones.md), la [pl
 
 ## Actualización y desinstalación
 
-1. En tu clon de esta herramienta, ejecuta `git pull --ff-only` y revisa los cambios.
-2. Si personalizaste la copia instalada, guarda esas modificaciones por separado. Renombra la carpeta instalada `gitflow-es` y muévela fuera de cualquier directorio de skills como respaldo.
-3. Copia la carpeta nueva siguiendo la instalación inicial y verifica su carga. Actualiza ambas copias si usas ambos agentes.
-4. Para desinstalar, elimina únicamente la carpeta `gitflow-es` de la ubicación elegida y reinicia la sesión. En instalaciones por repositorio, entrega la eliminación mediante PR.
+Para actualizar la instalación global, guarda antes cualquier personalización y vuelve a ejecutar el comando de instalación:
 
-Mover el respaldo fuera de los directorios de skills evita que el agente descubra dos versiones con el mismo nombre. No se incluyen instaladores que borren carpetas ni modifiquen la configuración personal.
+```bash
+npx skills add Danieloid3/gitflow-es --skill gitflow-es -g -a claude-code codex -y
+```
+
+Para una instalación por proyecto, ejecútalo desde la raíz de ese proyecto sin `-g` y entrega los cambios mediante PR. Después verifica la carga en cada agente. No necesitas mantener un clon de esta herramienta.
+
+Para desinstalar, elimina únicamente la instalación de `gitflow-es` de la ubicación elegida, incluidos sus enlaces si los hubiera, y reinicia la sesión. En instalaciones por repositorio, entrega la eliminación mediante PR. Si guardas una copia de respaldo, mantenla fuera de los directorios de skills para evitar que el agente descubra versiones duplicadas.
 
 ## Problemas habituales
 
